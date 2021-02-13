@@ -107,7 +107,7 @@ def display_results(file_hash):
         return render_template('display_results.html', results=results)
     else:
         # TODO: Render a Processing Icon
-        return "Still Processing"
+        return "Still Processing Please check back later."
 
 
 if __name__ == '__main__':

@@ -58,3 +58,14 @@ input[type=file] {
 .alert {
     margin: 0;
 }
+
+#dash_board {
+    background-color: orangered;
+  border: none;
+  color: Black;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+    border-radius: 8px;
+}
