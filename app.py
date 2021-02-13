@@ -1,4 +1,5 @@
 import os
+import redis
 from flask import Flask, request, redirect, url_for, render_template
 from celery import Celery
 from imohash import hashfile
@@ -23,6 +24,26 @@ celery.conf.update(app.config)
 task_dict = dict()
 
 
+# Redis Server Setup for Caching
+def redis_connect():
+    try:
+        client = redis.Redis(
+            host="localhost",
+            port=6379,
+            db=0,
+            socket_timeout=5,
+        )
+        ping = client.ping()
+        if ping is True:
+            return client
+    except redis.AuthenticationError as rd_auth_err:
+        raise redis.AuthenticationError("Invalid Auth!")
+        print(rd_auth_err.__traceback__)
+
+
+redis_client = redis_connect()
+
+
 def get_results_list():
     result_links = list()
     for key in task_dict.keys():
@@ -34,7 +55,7 @@ def get_results_list():
 @celery.task
 def get_scan_report(file_path):
     scan_obj = VtScanAPI(API_KEY, file_path)
-    scan_report = scan_obj.get_report()
+    scan_report = scan_obj.get_report(redis_client)
     return {'result': scan_report}
 
 
@@ -61,6 +82,7 @@ def upload_file():
         return render_template('upload_file.html')
 
 
+# TODO: Better Result display with Filename, file_hash and link
 @app.route('/results/')
 def result_list():
     return render_template('result_list.html', links_list=get_results_list())
