@@ -1,6 +1,7 @@
 import os
 import redis
-from flask import Flask, request, redirect, url_for, render_template
+import datetime
+from flask import Flask, request, redirect, url_for, render_template, flash
 from celery import Celery
 from imohash import hashfile
 from api.api import VtScanAPI, API_KEY
@@ -10,6 +11,8 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
 app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+# Set the secret key to some random bytes. Keep this really secret!
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 # File Upload settings and Allowed Extensions
 UPLOAD_FOLDER = './uploads/'
@@ -38,7 +41,6 @@ def redis_connect():
             return client
     except redis.AuthenticationError as rd_auth_err:
         raise redis.AuthenticationError("Invalid Auth!")
-        print(rd_auth_err.__traceback__)
 
 
 redis_client = redis_connect()
@@ -47,7 +49,12 @@ redis_client = redis_connect()
 def get_results_list():
     result_links = list()
     for key in task_dict.keys():
-        result_links.append(key)
+        disp_list_contents = {
+            'file_name' : task_dict[key]['file_name'],
+            'hash_key': task_dict[key]['hash_key'],
+            'time_crated': task_dict[key]['time_crated'],
+        }
+        result_links.append(disp_list_contents)
     return result_links
 
 
@@ -64,6 +71,7 @@ def get_scan_report(file_path):
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files or request.files['file'].filename == '':
+            flash(u'Invalid File POST. Please only post text files')
             return redirect(request.url)
 
         file = request.files['file']
@@ -76,13 +84,17 @@ def upload_file():
             report_obj = get_scan_report.delay(file_path)
             file_name_hash = hashfile(file_path, hexdigest=True)[:7]
 
-            task_dict[file_name_hash] = report_obj
+            task_dict[file_name_hash] = {'report_obj': report_obj, 'file_name': filename,
+                                         'time_crated': str(datetime.datetime.now()), 'hash_key': file_name_hash
+                                         }
             return redirect(url_for('result_list'))
+        else:
+            flash(u'Invalid File Type')
+            return redirect(request.url)
     else:
         return render_template('upload_file.html')
 
 
-# TODO: Better Result display with Filename, file_hash and link
 @app.route('/results/')
 def result_list():
     return render_template('result_list.html', links_list=get_results_list())
@@ -90,8 +102,8 @@ def result_list():
 
 @app.route('/results/<file_hash>')
 def display_results(file_hash):
-    if task_dict[file_hash].ready() is True:
-        results = task_dict[file_hash].get()['result']
+    if task_dict[file_hash]['report_obj'].ready() is True:
+        results = task_dict[file_hash]['report_obj'].get()['result']
         return render_template('display_results.html', results=results)
     else:
         # TODO: Render a Processing Icon

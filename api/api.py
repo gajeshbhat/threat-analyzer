@@ -6,8 +6,6 @@ import arrow
 from datetime import datetime, timedelta
 import time
 
-from pprint import pprint
-
 # logging.basicConfig(filename='logs.txt',
 #                     filemode='a',
 #                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -32,7 +30,7 @@ class VtScanAPI:
         self.file_path = file_path
         self.hash_list = list()
 
-    def get_report(self,redis_client: redis.Redis):
+    def get_report(self, redis_client: redis.Redis):
         """
         Reads the given file for Hashes and Scan's each Hash on VirusTotal's Public API
         and returns a report_object list.
@@ -43,23 +41,25 @@ class VtScanAPI:
 
         for hash_val in self.hash_list:
             if redis_client.exists(hash_val):
-                hash_report = self._get_hash_from_cache(hash_val,redis_client)
+                hash_report = self._get_hash_from_cache(hash_val, redis_client)
+                print("Cache used! Yay!")
                 report_objs.append(hash_report)
                 continue
+
             scan_resp = self._scan_hash(hash_val)
+
             if self.is_rate_limit(scan_resp):
-                time.sleep(60)  # Sleep for a minute. 1 Minute - 4 Requests and try again
+                time.sleep(60)
                 scan_resp = self._scan_hash(hash_val)
-                # If limited even after 1 minute. Day quota exceeded.
-                # TODO: Multiple user request is not considered for above code.
-                #  This time has to take into account other users making requests.
-                #  A Processing Queue for requests is ideal.
                 if self.is_rate_limit(scan_resp) is True:
                     # logging.info(f"Rate Limit Exceeded at for hash {hash_val} at {datetime.now()}\n")
                     continue
             hash_report = self.get_report_obj(hash_val, scan_resp)
-            if self._report_less_day(hash_report['scan_date']):
-                self._set_hash_to_cache(hash_val,hash_report,redis_client)
+
+            # Store in Cache if and only if scan date is very recent.
+            if hash_report['scan_date'] != 'N/A' and self._report_less_day(hash_report['scan_date']):
+                self._set_hash_to_cache(hash_val, hash_report, redis_client)
+
             report_objs.append(hash_report)
 
         return report_objs
@@ -84,7 +84,6 @@ class VtScanAPI:
             report_obj['num_of_detections'] = len(analysis_data)
             report_obj['scan_date'] = self._get_local_time(response_obj['data']['attributes']['last_analysis_date'])
         else:
-            # Log an Unknown Key or other error
             # logging.info(f"Unknown key in object {report_obj} found at time {datetime.now()}\n")
             pass
         return report_obj
@@ -97,7 +96,6 @@ class VtScanAPI:
             scan_request = requests.get(url=scan_url, headers=auth_header)
         except requests.exceptions.RequestException as request_exceptions:
             logging.error(f"The following Exception(s) at time {datetime.now()}\n" + request_exceptions.__traceback__)
-            pass
 
         scan_response = scan_request.json()
         return scan_response
@@ -137,16 +135,14 @@ class VtScanAPI:
 
     def _get_hash_from_cache(self, key, client: redis.Redis) -> str:
         """Get data from redis."""
-        val = client.get(key).decode('utf-8')
-        return val
+        hash_scan_res = json.loads(client.get(key).decode('utf-8'))
+        return hash_scan_res
 
     def _set_hash_to_cache(self, key, value, client: redis.Redis) -> bool:
         """Set data to redis."""
-        state = client.setex(key,timedelta(days=1), value=json.dumps(value), )
+        state = client.setex(key, timedelta(days=1), value=json.dumps(value))
         return state
 
 # if __name__ == '__main__':
-#     # TODO : Calculate ETA
-#     # TODO: Deploy to Heroku
+#     # TODO: Deploy to Heroku or AWS
 #     # TODO: Write Tests
-#     # TODO : Implement @LRU over Flask APP

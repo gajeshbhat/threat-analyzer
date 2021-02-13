@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Results from the Scan</title>
+     <link rel="stylesheet" href="{{ url_for('static', filename='disp_res.css') }}">
 </head>
 <body>
-<table>
+<h1 align="center">VirusTotal Scan Results for Md5 Hash</h1>
+<table id="threat_list">
 <tr>
     <th>Hash value</th>
     <th>Fortinet Detection Name</th>
@@ -18,6 +20,7 @@
    <TD>{{result.forti_detect_names}}</TD>
    <TD><SPAN>{{result.num_of_detections}}</SPAN></TD>
    <TD><SPAN>{{result.scan_date}}</SPAN></TD>
+<TD><SPAN>{{result.cached}}</SPAN></TD>
 </TR>
 {% endfor %}
 </table>

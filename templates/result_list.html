@@ -2,14 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='disp_res.css') }}">
     <title>Links to Reports</title>
-    {% for url in links_list %}
-    <script language="JavaScript">
-        document.write( "<a href='/results/{{ url }}'>{{ url }}</a><br/>" );
-    </script>
-{% endfor %}
 </head>
 <body>
-
+<h1 align="center">Threat Scan List</h1>
+<table id="threat_list">
+<tr>
+    <th>File Name</th>
+    <th>Short file hash</th>
+    <th>Date and Time Created</th>
+    <th>Link</th>
+</tr>
+{% for result in links_list %}
+<TR>
+   <TD>{{result.file_name}}</TD>
+   <TD>{{result.hash_key}}</TD>
+   <TD><SPAN>{{result.time_crated}}</SPAN></TD>
+   <TD><a href="/results/{{ result.hash_key }}">Result Link</a></TD>
+</TR>
+{% endfor %}
+</table>
 </body>
 </html>
