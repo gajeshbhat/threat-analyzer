@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Links to Reports</title>
+    {% for url in links_list %}
+    <script language="JavaScript">
+        document.write( "<a href='/results/{{ url }}'>{{ url }}</a><br/>" );
+    </script>
+{% endfor %}
+</head>
+<body>
+
+</body>
+</html>

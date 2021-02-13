@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results from the Scan</title>
+</head>
+<body>
+<table>
+<tr>
+    <th>Hash value</th>
+    <th>Fortinet Detection Name</th>
+    <th>Number of detections</th>
+    <th>Scan Date</th>
+</tr>
+{% for result in results %}
+<TR>
+   <TD>{{result.hash_value}}</TD>
+   <TD>{{result.forti_detect_names}}</TD>
+   <TD><SPAN>{{result.num_of_detections}}</SPAN></TD>
+   <TD><SPAN>{{result.scan_date}}</SPAN></TD>
+</TR>
+{% endfor %}
+</table>
+
+</body>
+</html>
