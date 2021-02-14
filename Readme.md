@@ -60,11 +60,12 @@ Python3, Flask, Celery, Redis, Linux (Test on Ubuntu VM) , Basic HTML and CSS.
     Or just using sudo make install.
     <br/><br/>
     I assume that /usr/local/bin is in your PATH environment variable so that you can execute both the binaries without specifying the full path. <br/><br/>
-
- 6. **Setup Flask and run** <br/> <br/>
-        `export FLASK_ENV=development`
-        `export FLASK_APP=app.py`
-        `flask run`
+    
+ 6. **Setup Environment variables and Flask** <br/> <br/>
+    First, Setup all the environment variables for the project using `setup_envs.sh` and now run flask using the following commands <br><br>
+    `export FLASK_ENV=development` <br>
+    `export FLASK_APP=app.py` <br>
+    `flask run` <br>
 
     <br/>
     

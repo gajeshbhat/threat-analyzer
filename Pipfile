@@ -11,6 +11,7 @@ celery = "*"
 redis = "*"
 imohash = "*"
 gunicorn = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

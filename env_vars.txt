@@ -1,0 +1,8 @@
+export REDIS_URL="redis://localhost:6379/0"
+export APP_SECRET="fdbcaf05caf7781a6554e45eccb5c6cdc176578062e608cc"
+export REDIS_HOST="localhost"
+export REDIS_PASS=""
+export REDIS_PORT="6379"
+export REDIS_URL="redis://localhost:6379/0"
+export UPLOADS_FOLDER="./uploads/"
+export VT_API_KEY="3b6d7e70adaf2d0c5f844d95c5c95ac0026a7400f85dfb1e2bd760907decff3a"
