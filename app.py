@@ -14,8 +14,9 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('APP_SECRET')
 
 # File Upload settings and Allowed Extensions
+UPLOAD_FOLDER = os.environ.get('UPLOADS_FOLDER')
 ALLOWED_EXTENSIONS = {'txt'}
-app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOADS_FOLDER')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Celery Message Broker and Task Runner Config
 celery = Celery(app.name)
