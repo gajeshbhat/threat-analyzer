@@ -105,10 +105,11 @@ def upload_file():
             report_obj = get_scan_report.delay(file_path)
             file_name_hash = hashfile(file_path, hexdigest=True)[:7]
 
-            reports_collection[file_name_hash] = {'report_obj': report_obj, 'file_name': filename,
-                                                  'time_crated': str(datetime.datetime.now()),
-                                                  'hash_key': file_name_hash
-                                                  }
+            promise_obj = {'report_obj': report_obj, 'file_name': filename,
+                           'time_crated': str(datetime.datetime.now()),
+                           'hash_key': file_name_hash
+                           }
+            reports_collection[file_name_hash] = promise_obj
             return redirect(url_for('result_list'))
         else:
             flash(u'Invalid File Type')
