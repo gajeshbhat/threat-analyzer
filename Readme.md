@@ -14,9 +14,11 @@ It checks the list of hashes (Uploaded in a form of text file) against the virus
 8. Results page is public and other users can view your results. (Due to time constraints I could not implement User Sessions).
 9. Applications also implements Cache and stores all the scan results that are less than a day old so that they can be retrieved quickly.
 
+## Tech Stack
 
+Python3, Flask, Celery, Redis, Linux (Test on Ubuntu VM) , Basic HTML and CSS.
 
-## Installation Instructions:
+## Installation Instructions and Dependency:
 
 1. **Install Python 3:** (Python 3.8 Preferred as it was used in the development)
     (Installation instructions vary by LinuX Distro.)
@@ -79,6 +81,13 @@ It checks the list of hashes (Uploaded in a form of text file) against the virus
 
 
 Application is ready for use. Go to `http://127.0.0.1:5000/`
+
+## Issues Encountered and Addressed
+
+1. **File Validation** : Making Sure that only text files are parsed and only Md5 and SHA-256 were parsed in the file. Addressed with the help of Flask File parsing modules and Regular expressions.
+2. **API Rate Limit** : Dealing with API Rate limits and pausing requests when timeouts occurred. Addressed using time.sleep module and caching using Redis.
+3. **Async Tasks** : Creating and Executing background tasks and constantly querying them for updates.
+4. **Celery and Message Queues** : Setting up and using messaging to enable Async capacity using Celery. Documentation was helpful in calrifying errors and concepts.
 
 ## Screenshots:
 ![Home Page](screenshots/a.png)
