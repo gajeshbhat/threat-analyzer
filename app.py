@@ -11,12 +11,11 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # Set the secret key to some random bytes. Keep this really secret!
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.secret_key = os.environ.get('APP_SECRET')
 
 # File Upload settings and Allowed Extensions
-UPLOAD_FOLDER = './uploads/'
 ALLOWED_EXTENSIONS = {'txt'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOADS_FOLDER')
 
 # Celery Message Broker and Task Runner Config
 celery = Celery(app.name)

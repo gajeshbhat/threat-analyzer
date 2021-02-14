@@ -1,5 +1,6 @@
 import logging
 import re
+import os
 import time
 import requests
 import arrow
@@ -31,7 +32,7 @@ FORTINET_NA = "No detection for Fortinet Engine"
 MD5_REGEX = "([a-fA-F\d]{32})"
 SHA256_REGEX = "\b[A-Fa-f0-9]{64}\b"
 
-API_KEY = '3b6d7e70adaf2d0c5f844d95c5c95ac0026a7400f85dfb1e2bd760907decff3a'
+API_KEY = os.environ.get('VT_API_KEY')
 
 
 # Helper Methods
