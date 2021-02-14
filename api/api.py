@@ -3,6 +3,7 @@ import json
 import redis
 import logging
 import arrow
+import re
 from datetime import datetime, timedelta
 import time
 
@@ -109,7 +110,15 @@ class VtScanAPI:
         else:
             with open(self.file_path, "rb") as file_pointer:
                 for each_line in file_pointer:
-                    hash_list.append(str(each_line.strip().decode('utf-8')))
+                    line_data = str(each_line.strip().decode('utf-8'))
+
+                    # MD5 and SHA-256 Regex check
+                    md5_check = len(re.findall(r"([a-fA-F\d]{32})", line_data)) > 0
+                    sha_256_check = len(re.findall(r"\b[A-Fa-f0-9]{64}\b",line_data)) > 0
+
+                    is_req_hash = md5_check or sha_256_check
+                    if each_line != "" and is_req_hash:
+                        hash_list.append(line_data)
             file_pointer.close()
         return hash_list
 
