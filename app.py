@@ -30,7 +30,7 @@ celery.conf.update(
 def redis_connect():
     try:
         client = redis.Redis(
-            host=os.environ.get('REDIS_URL'),
+            host=os.environ.get('REDIS_URL').encode('idna'),
             port=6379,
             db=0,
             socket_timeout=5,
