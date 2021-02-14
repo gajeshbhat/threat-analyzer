@@ -18,6 +18,7 @@ SCAN_DATE_KEY = "scan_date"
 DATA_KEY = "data"
 ATTR_KEY = "attributes"
 LAT_ANA_RES_KEY = "last_analysis_results"
+LAT_ANA_DATE_KEY = "last_analysis_date"
 RES_KEY = "result"
 FORTI_NAME_KEY = "Fortinet"
 QUOTA_ERROR_KEY = "QuotaExceededError"
@@ -34,7 +35,7 @@ API_KEY = '3b6d7e70adaf2d0c5f844d95c5c95ac0026a7400f85dfb1e2bd760907decff3a'
 
 # Helper Methods
 
-def _is_rate_limit(scan_resp):
+def is_rate_limit(scan_resp):
     """
     Returns True if the API Parses has hit the rate limit else False
     :param scan_resp:
@@ -65,13 +66,13 @@ def set_report_cache(key, value, client: redis.Redis):
     client.setex(key, timedelta(days=1), value=json.dumps(value))
 
 
-def get_local_time(param):
+def get_local_time(utc_string):
     """
     Returns local time strings given UTC time
-    :param param:
+    :param utc_string:
     :return:
     """
-    utc_datetime = arrow.get(param)
+    utc_datetime = arrow.get(utc_string)
     return utc_datetime.to('local').format()
 
 
@@ -114,7 +115,7 @@ def get_scan_report(hash_val, resp):
             scan_report[FORTI_TAG] = FORTINET_NA
 
         scan_report[NUM_DETECT_KEY] = len(analysis_data)
-        report_utc_time = resp[DATA_KEY][ATTR_KEY][LAT_ANA_RES_KEY]
+        report_utc_time = resp[DATA_KEY][ATTR_KEY][LAT_ANA_DATE_KEY]
         scan_report[SCAN_DATE_KEY] = get_local_time(report_utc_time)
 
     return scan_report
@@ -170,11 +171,11 @@ class VtScanAPI:
                 continue
 
             # If Rate maxed out, wait.
-            if _is_rate_limit(scan_resp):
+            if is_rate_limit(scan_resp):
                 time.sleep(60)
                 scan_resp = self._scan_hash(hash_val)
                 # Rate limit after wait, exhausted daily quota. Drop and Continue.
-                if _is_rate_limit(scan_resp):
+                if is_rate_limit(scan_resp):
                     continue
 
             # Get Report dict using the scan report response
@@ -197,7 +198,6 @@ class VtScanAPI:
         :param hash_val: 
         :return scan_response:
         """
-
         # Prepare URL and Request
         scan_url = str(self.SCAN_API_URL + hash_val)
         auth_header = {'x-apikey': self.api_key}
