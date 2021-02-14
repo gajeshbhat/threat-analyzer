@@ -24,9 +24,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 celery = Celery(app.name, backend=app.config['CELERY_RESULT_BACKEND'], broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
-# Global Dict Data Structures to Store Async Task Objects and related methods
-task_dict = dict()
-
 
 # Redis Server Setup for Caching
 def redis_connect():
@@ -44,24 +41,41 @@ def redis_connect():
         raise redis.AuthenticationError("Invalid Auth!")
 
 
+# Redis client to connect to Redis Cache server
 redis_client = redis_connect()
 
+# Helper methods
 
+# Global Dict Data Structures to Store Async Task Objects and related methods.
+# A cache or persistence store is preferable here but given the time constraints I have used in-memory data structure,
+reports_collection = dict()
+
+
+# Get's all the reports stored in-memory in task_dict
 def get_results_list():
+    """
+    Retunrs the list of All the Reports. Including FileName, File Hash,Time Created and Link to the Results
+    :return:
+    """
     result_links = list()
-    for key in task_dict.keys():
+    for key in reports_collection.keys():
         disp_list_contents = {
-            'file_name' : task_dict[key]['file_name'],
-            'hash_key': task_dict[key]['hash_key'],
-            'time_crated': task_dict[key]['time_crated'],
+            'file_name': reports_collection[key]['file_name'],
+            'hash_key': reports_collection[key]['hash_key'],
+            'time_crated': reports_collection[key]['time_crated'],
         }
         result_links.append(disp_list_contents)
     return result_links
 
 
-# Async Methods to Scan the API
+# Celery Task to Run API Requests in the Background
 @celery.task
 def get_scan_report(file_path):
+    """
+    Reads a file path and Scans the Text files in the Background.
+    :param file_path:
+    :return promise_object:
+    """
     scan_obj = VtScanAPI(API_KEY, file_path)
     scan_report = scan_obj.get_file_report(redis_client)
     return {'result': scan_report}
@@ -70,6 +84,10 @@ def get_scan_report(file_path):
 # Flask Methods for Routes
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
+    """
+    Uploads the and vlaidates the Text files to the Server.
+    :return:
+    """
     if request.method == 'POST':
         if 'file' not in request.files or request.files['file'].filename == '':
             flash(u'Invalid File POST. Please only post text files')
@@ -85,9 +103,10 @@ def upload_file():
             report_obj = get_scan_report.delay(file_path)
             file_name_hash = hashfile(file_path, hexdigest=True)[:7]
 
-            task_dict[file_name_hash] = {'report_obj': report_obj, 'file_name': filename,
-                                         'time_crated': str(datetime.datetime.now()), 'hash_key': file_name_hash
-                                         }
+            reports_collection[file_name_hash] = {'report_obj': report_obj, 'file_name': filename,
+                                                  'time_crated': str(datetime.datetime.now()),
+                                                  'hash_key': file_name_hash
+                                                  }
             return redirect(url_for('result_list'))
         else:
             flash(u'Invalid File Type')
@@ -103,8 +122,8 @@ def result_list():
 
 @app.route('/results/<file_hash>')
 def display_results(file_hash):
-    if task_dict[file_hash]['report_obj'].ready() is True:
-        results = task_dict[file_hash]['report_obj'].get()['result']
+    if reports_collection[file_hash]['report_obj'].ready() is True:
+        results = reports_collection[file_hash]['report_obj'].get()['result']
         return render_template('display_results.html', results=results)
     else:
         return render_template('loading_scan.html')

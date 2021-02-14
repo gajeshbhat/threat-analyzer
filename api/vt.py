@@ -23,6 +23,7 @@ RES_KEY = "result"
 FORTI_NAME_KEY = "Fortinet"
 QUOTA_ERROR_KEY = "QuotaExceededError"
 
+# Strings
 NOT_AVAIL = "N/A"
 FORTINET_NA = "No detection for Fortinet Engine"
 
