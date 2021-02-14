@@ -87,7 +87,7 @@ def get_scan_report(file_path):
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     """
-    Uploads the and vlaidates the Text files to the Server.
+    Uploads the and validates the Text files to the Server.
     :return:
     """
     if request.method == 'POST':
