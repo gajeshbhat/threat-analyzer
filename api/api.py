@@ -19,7 +19,6 @@ class VtScanAPI:
     SCAN_API_URL = str("https://www.virustotal.com/api/v3/files/")
 
     def __init__(self, api_key, file_path):
-
         if not isinstance(api_key, str):
             raise ValueError('API key must be a string.')
 
@@ -38,7 +37,6 @@ class VtScanAPI:
         """
         self.hash_list = self._read_file()
         report_objs = list()
-
         for hash_val in self.hash_list:
             if redis_client.exists(hash_val):
                 hash_report = self._get_hash_from_cache(hash_val, redis_client)

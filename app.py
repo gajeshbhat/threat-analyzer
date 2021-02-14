@@ -11,6 +11,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
 app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
 # Set the secret key to some random bytes. Keep this really secret!
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
@@ -106,8 +107,7 @@ def display_results(file_hash):
         results = task_dict[file_hash]['report_obj'].get()['result']
         return render_template('display_results.html', results=results)
     else:
-        # TODO: Render a Processing Icon
-        return "Still Processing Please check back later."
+        return render_template('loading_scan.html')
 
 
 if __name__ == '__main__':
