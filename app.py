@@ -9,8 +9,8 @@ from werkzeug.utils import secure_filename
 
 # Flask App declaration and settings
 app = Flask(__name__)
-app.config['BROKER_URL'] = os.getenv('BROKER_URL')
-app.config['CELERY_RESULT_BACKEND'] = os.getenv('CELERY_RESULT_BACKEND')
+app.config['BROKER_URL'] = os.getenv('REDIS_URL')
+app.config['CELERY_RESULT_BACKEND'] = os.getenv('REDIS_URL')
 
 # Set the secret key to some random bytes. Keep this really secret!
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
