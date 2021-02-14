@@ -9,8 +9,6 @@ from werkzeug.utils import secure_filename
 
 # Flask App declaration and settings
 app = Flask(__name__)
-app.config['BROKER_URL'] = os.environ.get('REDIS_URL')
-app.config['CELERY_RESULT_BACKEND'] = os.environ.get('REDIS_URL')
 
 # Set the secret key to some random bytes. Keep this really secret!
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -21,15 +19,17 @@ ALLOWED_EXTENSIONS = {'txt'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Celery Message Broker and Task Runner Config
-celery = Celery(app.name, backend=app.config['CELERY_RESULT_BACKEND'], broker=app.config['BROKER_URL'])
-celery.conf.update(app.config)
-
+celery = Celery(app.name)
+celery.conf.update(
+                   BROKER_URL=os.environ.get('REDIS_URL'),
+                   CELERY_RESULT_BACKEND=os.environ.get('REDIS_URL')
+                   )
 
 # Redis Server Setup for Caching
 def redis_connect():
     try:
         client = redis.Redis(
-            host="localhost",
+            host=os.environ.get('REDIS_URL'),
             port=6379,
             db=0,
             socket_timeout=5,
