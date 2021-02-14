@@ -3,6 +3,11 @@
 This project builds a minimal threat analyzer using the VirusTotal's Public API.
 It checks the list of hashes (Uploaded in a form of text file) against the virustotal.com database using their Public API.
 
+**Deployed App** : App is Live at https://stormy-gorge-95051.herokuapp.com/
+
+**NOTE** : I have deployed the app on Heroku free tier. Due to this, app can sometimes be slow or throw a 503. This is not because of my code but by using the free tier.
+PLEASE Keep refreshing if its slow or not responsive with the latest updates. You will get the results eventually.
+
 ### Here are some features of the Project.
 
 1. Built with Python MicroFramework Flask. A user can upload a text file for analysis.
