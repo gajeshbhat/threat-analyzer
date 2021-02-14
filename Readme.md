@@ -5,7 +5,7 @@ It checks the list of hashes (Uploaded in a form of text file) against the virus
 
 **Deployed App** : App is Live at https://stormy-gorge-95051.herokuapp.com/
 
-**NOTE** : I have deployed the app on Heroku free tier. Due to this, app can sometimes be slow or throw a 503. This is not because of my code but by using the free tier.
+**NOTE** : I have deployed the app on Heroku free tier. Due to this, app can sometimes be slow or throw a 503. This is not because of my code but due to the usage of free tier.
 PLEASE Keep refreshing if its slow or not responsive with the latest updates. You will get the results eventually.
 
 ### Here are some features of the Project.
