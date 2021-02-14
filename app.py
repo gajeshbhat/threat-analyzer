@@ -4,7 +4,7 @@ import datetime
 from flask import Flask, request, redirect, url_for, render_template, flash
 from celery import Celery
 from imohash import hashfile
-from api.api import VtScanAPI, API_KEY
+from api.vt import VtScanAPI, API_KEY
 from werkzeug.utils import secure_filename
 
 # Flask App declaration and settings
@@ -63,7 +63,7 @@ def get_results_list():
 @celery.task
 def get_scan_report(file_path):
     scan_obj = VtScanAPI(API_KEY, file_path)
-    scan_report = scan_obj.get_report(redis_client)
+    scan_report = scan_obj.get_file_report(redis_client)
     return {'result': scan_report}
 
 
