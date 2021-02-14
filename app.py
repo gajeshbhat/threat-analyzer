@@ -30,9 +30,10 @@ celery.conf.update(
 def redis_connect():
     try:
         client = redis.Redis(
-            host=os.environ.get('REDIS_URL').encode('idna'),
-            port=6379,
+            host='ec2-54-235-167-86.compute-1.amazonaws.com',
+            port=9679,
             db=0,
+            password='p10b1c72461f51aeb434b56d2c35ba53b61c31932b9edb7c2cbea4957a2211e57',
             socket_timeout=5,
         )
         ping = client.ping()
