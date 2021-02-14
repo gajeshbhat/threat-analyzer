@@ -21,9 +21,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Celery Message Broker and Task Runner Config
 celery = Celery(app.name)
 celery.conf.update(
-                   BROKER_URL=os.environ.get('REDIS_URL'),
-                   CELERY_RESULT_BACKEND=os.environ.get('REDIS_URL')
-                   )
+    BROKER_URL=os.environ.get('REDIS_URL'),
+    CELERY_RESULT_BACKEND=os.environ.get('REDIS_URL')
+)
+
 
 # Redis Server Setup for Caching
 def redis_connect():
