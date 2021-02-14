@@ -6,4 +6,4 @@ source ~/.bashrc
 
 #Create a local ENV file and export the vars there
 touch .env
-cat env_vars.txt > ~/.bashrc
+cat env_vars.txt > .env
