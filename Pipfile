@@ -10,6 +10,7 @@ arrow = "*"
 celery = "*"
 redis = "*"
 imohash = "*"
+gunicorn = "*"
 
 [dev-packages]
 

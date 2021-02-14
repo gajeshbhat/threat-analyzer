@@ -9,8 +9,8 @@ from werkzeug.utils import secure_filename
 
 # Flask App declaration and settings
 app = Flask(__name__)
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+app.config['BROKER_URL'] = os.getenv('BROKER_URL')
+app.config['CELERY_RESULT_BACKEND'] = os.getenv('CELERY_RESULT_BACKEND')
 
 # Set the secret key to some random bytes. Keep this really secret!
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -21,7 +21,7 @@ ALLOWED_EXTENSIONS = {'txt'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Celery Message Broker and Task Runner Config
-celery = Celery(app.name, backend=app.config['CELERY_RESULT_BACKEND'], broker=app.config['CELERY_BROKER_URL'])
+celery = Celery(app.name, backend=app.config['CELERY_RESULT_BACKEND'], broker=app.config['BROKER_URL'])
 celery.conf.update(app.config)
 
 
