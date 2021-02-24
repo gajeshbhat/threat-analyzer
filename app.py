@@ -46,8 +46,6 @@ def redis_connect():
 # Redis client to connect to Redis Cache server
 redis_client = redis_connect()
 
-# Helper methods
-
 # Global Dict Data Structures to Store Async Task Objects and related methods.
 # A cache or persistence store is preferable here but given the time constraints I have used in-memory data structure,
 reports_collection = dict()
