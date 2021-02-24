@@ -51,7 +51,7 @@ redis_client = redis_connect()
 reports_collection = dict()
 
 
-# Get's all the reports stored in-memory in task_dict
+# Get links to all the reports stored in-memory
 def get_results_list():
     """
     Retunrs the list of All the Reports. Including FileName, File Hash,Time Created and Link to the Results
@@ -100,6 +100,7 @@ def upload_file():
             file_path = os.path.join(UPLOAD_FOLDER, filename)
             file.save(file_path)
 
+            # Call the celery task method with delay() to return an promise object
             report_obj = get_scan_report.delay(file_path)
             file_name_hash = hashfile(file_path, hexdigest=True)[:7]
 
@@ -107,6 +108,7 @@ def upload_file():
                            'time_crated': str(datetime.datetime.now()),
                            'hash_key': file_name_hash
                            }
+            # In memory dictionary of promise objects mapped to file hashes
             reports_collection[file_name_hash] = promise_obj
             return redirect(url_for('result_list'))
         else:
@@ -123,10 +125,12 @@ def result_list():
 
 @app.route('/results/<file_hash>')
 def display_results(file_hash):
+    # Ready returns true if the background object executed successfully. Otherwise Provides traceback of the error
     if reports_collection[file_hash]['report_obj'].ready() is True:
         results = reports_collection[file_hash]['report_obj'].get()['result']
         return render_template('display_results.html', results=results)
     else:
+        # Keep loading until the results are processed.
         return render_template('loading_scan.html')
 
 

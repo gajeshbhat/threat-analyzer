@@ -80,7 +80,7 @@ def get_local_time(utc_string):
 
 def report_less_day(param):
     """
-    Returns True if the given time is less than a day.Else False.
+    Returns True if the given time is less than a day.
     :param param:
     :return:
     """
